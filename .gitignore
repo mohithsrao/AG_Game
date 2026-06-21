@@ -16,3 +16,5 @@ Source/.mono/
 Source/data_*/
 Source/mono_crash.*.json
 
+# Builds
+Builds/
