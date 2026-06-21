@@ -933,13 +933,39 @@ DASHBOARD_TEMPLATE = """<!DOCTYPE html>
 
 # Hardcoded simulated logs
 def run_simulation(prompt):
+    branch_name = os.environ.get("FEATURE_BRANCH", "feature/auto-branch")
     print(f"{Colors.HEADER}{Colors.BOLD}=== Godot AI Agent Round Table - Mock Simulation ==={Colors.ENDC}")
-    print(f"Goal: {prompt}\n")
+    print(f"Goal: {prompt}")
+    print(f"Target Branch: {branch_name}\n")
+
+    import subprocess
+    import shutil
+
+    git_cmd = shutil.which("git")
+    git_log = ""
+    if git_cmd:
+        print(f"{Colors.BLUE}=== Git Flow: Preparing Feature Branch ==={Colors.ENDC}")
+        res = subprocess.run([git_cmd, "branch", "--show-current"], capture_output=True, text=True)
+        current_branch = res.stdout.strip()
+        print(f"  Current branch: {current_branch}")
+        
+        res_check = subprocess.run([git_cmd, "show-ref", f"refs/heads/{branch_name}"], capture_output=True)
+        if res_check.returncode == 0:
+            print(f"  Branch '{branch_name}' already exists. Checking it out...")
+            subprocess.run([git_cmd, "checkout", branch_name])
+            git_log += f"$ git checkout {branch_name}\nChecked out existing branch '{branch_name}'\n"
+        else:
+            print(f"  Creating and checking out new feature branch: '{branch_name}'...")
+            subprocess.run([git_cmd, "checkout", "-b", branch_name])
+            git_log += f"$ git checkout -b {branch_name}\nCreated and checked out new branch '{branch_name}'\n"
+    else:
+        print(f"{Colors.WARNING}Warning: git command not found. Skipping physical git branch creation.{Colors.ENDC}")
+        git_log += "Git not found on system. Skipping branch creation.\n"
     
     chat_logs = [
         {
             "sender": "coordinator",
-            "message": f"Welcome team to this development sprint. Our goal is to implement: '{prompt}' in the project. We will strictly adhere to our software patterns, strict static typing, modular folder structure, and three-tier GUT testing. Let's start with Game Design. Game Designer, please draft the GDD."
+            "message": f"Welcome team to this development sprint. Our goal is to implement: '{prompt}' on branch '{branch_name}'. We will strictly adhere to our software patterns, strict static typing, modular folder structure, and three-tier GUT testing. Let's start with Game Design. Game Designer, please draft the GDD."
         },
         {
             "sender": "game_designer",
@@ -1142,6 +1168,29 @@ def run_simulation(prompt):
         sys.exit(1)
     print(f"  {Colors.GREEN}[OK] Coordinator Gate: Builds Verification Completed.{Colors.ENDC}")
 
+    if git_cmd:
+        print(f"\n{Colors.BLUE}=== Git Flow: Merging Feature Branch to main ==={Colors.ENDC}")
+        subprocess.run([git_cmd, "add", "."])
+        subprocess.run([git_cmd, "commit", "-m", f"feat: implement {prompt}"])
+        git_log += f"\n$ git add .\n$ git commit -m \"feat: implement {prompt}\"\nCommitted changes to '{branch_name}'\n"
+        
+        print(f"  Checking out 'main' branch...")
+        subprocess.run([git_cmd, "checkout", "main"])
+        git_log += f"\n$ git checkout main\nSwitched to branch 'main'\n"
+        
+        print(f"  Merging branch '{branch_name}' into 'main'...")
+        merge_res = subprocess.run([git_cmd, "merge", branch_name], capture_output=True, text=True)
+        print(merge_res.stdout)
+        git_log += f"\n$ git merge {branch_name}\n{merge_res.stdout}\n"
+        
+        if merge_res.returncode == 0:
+            print(f"  {Colors.GREEN}[OK] Merge successful! Feature is complete.{Colors.ENDC}")
+            git_log += "Merge complete. Task is done.\n"
+        else:
+            print(f"  {Colors.FAIL}[ERROR] Merge conflicted or failed. Feature is not complete until conflicts are resolved.{Colors.ENDC}")
+            git_log += f"Merge failed with return code {merge_res.returncode}. Conflict resolution required.\n"
+            sys.exit(1)
+
     # Package data for HTML template
     run_data = {
         "prompt": prompt,
@@ -1155,7 +1204,7 @@ def run_simulation(prompt):
             "tad.md": MOCK_TAD,
             "manual_tests.md": MOCK_MANUAL_TESTS
         },
-        "logs": console_log
+        "logs": git_log + "\n" + console_log
     }
 
     # Render HTML Dashboard
@@ -1174,10 +1223,33 @@ def main():
     parser.add_argument("--mock", action="store_true", default=True, help="Force mock simulation mode")
     parser.add_argument("--live", action="store_true", help="Run live agents using LLM credentials (requires API keys)")
     parser.add_argument("--godot-path", type=str, default=None, help="Path to Godot executable")
+    parser.add_argument("--branch", type=str, default=None, help="Name of feature branch")
     args = parser.parse_args()
 
     if args.godot_path:
         os.environ["GODOT_PATH"] = args.godot_path
+
+    # Determine feature branch name
+    branch_name = args.branch
+    if not branch_name:
+        if sys.stdin.isatty():
+            try:
+                branch_name = input("Enter branch name for feature development (e.g. feature/double-jump): ").strip()
+            except (KeyboardInterrupt, EOFError):
+                print("\n[ERROR] Branch input interrupted. Exiting.")
+                sys.exit(1)
+        else:
+            import re
+            clean_prompt = re.sub(r'[^a-zA-Z0-9\s-]', '', args.prompt).strip().lower()
+            clean_prompt = re.sub(r'[\s-]+', '-', clean_prompt)
+            branch_name = f"feature/{clean_prompt}"
+            print(f"Non-interactive terminal: auto-generating branch name '{branch_name}'")
+    
+    if not branch_name:
+        print("[ERROR] Branch name cannot be empty.")
+        sys.exit(1)
+    
+    os.environ["FEATURE_BRANCH"] = branch_name
 
     # If --live is specifically set, warn if no API keys are found and fall back
     if args.live:
