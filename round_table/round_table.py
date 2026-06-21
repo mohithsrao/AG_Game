@@ -1169,27 +1169,52 @@ def run_simulation(prompt):
     print(f"  {Colors.GREEN}[OK] Coordinator Gate: Builds Verification Completed.{Colors.ENDC}")
 
     if git_cmd:
-        print(f"\n{Colors.BLUE}=== Git Flow: Merging Feature Branch to main ==={Colors.ENDC}")
+        print(f"\n{Colors.BLUE}=== Git Flow: PR & Code Review Gate ==={Colors.ENDC}")
         subprocess.run([git_cmd, "add", "."])
         subprocess.run([git_cmd, "commit", "-m", f"feat: implement {prompt}"])
         git_log += f"\n$ git add .\n$ git commit -m \"feat: implement {prompt}\"\nCommitted changes to '{branch_name}'\n"
         
-        print(f"  Checking out 'main' branch...")
-        subprocess.run([git_cmd, "checkout", "main"])
-        git_log += f"\n$ git checkout main\nSwitched to branch 'main'\n"
+        print(f"\n{Colors.WARNING}Development complete on branch '{branch_name}'.{Colors.ENDC}")
+        print(f"{Colors.WARNING}Please review the generated code and documents before merging.{Colors.ENDC}")
         
-        print(f"  Merging branch '{branch_name}' into 'main'...")
-        merge_res = subprocess.run([git_cmd, "merge", branch_name], capture_output=True, text=True)
-        print(merge_res.stdout)
-        git_log += f"\n$ git merge {branch_name}\n{merge_res.stdout}\n"
-        
-        if merge_res.returncode == 0:
-            print(f"  {Colors.GREEN}[OK] Merge successful! Feature is complete.{Colors.ENDC}")
-            git_log += "Merge complete. Task is done.\n"
+        should_merge = False
+        if sys.stdin.isatty():
+            try:
+                user_choice = input("\nConfirm merge to main branch? (y/n): ").strip().lower()
+                should_merge = (user_choice == 'y')
+            except (KeyboardInterrupt, EOFError):
+                print("\n[ERROR] Merge confirmation interrupted. Merge aborted.")
+                sys.exit(1)
         else:
-            print(f"  {Colors.FAIL}[ERROR] Merge conflicted or failed. Feature is not complete until conflicts are resolved.{Colors.ENDC}")
-            git_log += f"Merge failed with return code {merge_res.returncode}. Conflict resolution required.\n"
-            sys.exit(1)
+            print(f"{Colors.WARNING}Non-interactive terminal detected. Skipping automated merge to allow code review.{Colors.ENDC}")
+            print(f"To complete the task, review the changes on branch '{branch_name}' and run:\n  git checkout main && git merge {branch_name}")
+            git_log += "Automated merge skipped (non-interactive mode). Pending manual code review.\n"
+            should_merge = False
+
+        if should_merge:
+            print(f"  Checking out 'main' branch...")
+            subprocess.run([git_cmd, "checkout", "main"])
+            git_log += f"\n$ git checkout main\nSwitched to branch 'main'\n"
+            
+            print(f"  Merging branch '{branch_name}' into 'main'...")
+            merge_res = subprocess.run([git_cmd, "merge", branch_name], capture_output=True, text=True)
+            print(merge_res.stdout)
+            git_log += f"\n$ git merge {branch_name}\n{merge_res.stdout}\n"
+            
+            if merge_res.returncode == 0:
+                print(f"  {Colors.GREEN}[OK] Merge successful! Feature is complete.{Colors.ENDC}")
+                git_log += "Merge complete. Task is done.\n"
+            else:
+                print(f"  {Colors.FAIL}[ERROR] Merge conflicted or failed. Feature is not complete until conflicts are resolved.{Colors.ENDC}")
+                git_log += f"Merge failed with return code {merge_res.returncode}. Conflict resolution required.\n"
+                sys.exit(1)
+        else:
+            if sys.stdin.isatty():
+                print(f"{Colors.WARNING}Merge aborted by user. Feature remains on branch '{branch_name}'.{Colors.ENDC}")
+                git_log += "Merge aborted by user. Branch left unmerged.\n"
+            else:
+                # In non-interactive mode, save dashboard data and exit cleanly
+                pass
 
     # Package data for HTML template
     run_data = {
