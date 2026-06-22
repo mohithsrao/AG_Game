@@ -66,6 +66,7 @@ jobs:
         godot --headless --path Source -s res://addons/gut/gut_cmdln.gd -gdir=res:// -gexit
 
     - name: Export Project Releases
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: |
         echo "Preparing build folders..."
         mkdir -p Source/Builds/Windows
@@ -82,6 +83,7 @@ jobs:
         godot --headless --path Source --export-release "Web" Builds/Web/index.html
 
     - name: Upload Export Artifacts
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       uses: actions/upload-artifact@v4
       with:
         name: godot-release-builds
