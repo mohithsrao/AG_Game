@@ -237,7 +237,7 @@ extends GutTest
 
 ## Automated tests for the Player double-jump mechanics.
 
-var player_scene: PackedScene = load("res://Source/Entities/Player/player.tscn")
+var player_scene: PackedScene = load("res://Entities/Player/player.tscn")
 var _player: Player = null
 
 func before_each() -> void:
@@ -321,15 +321,15 @@ platform="Windows Desktop"
 runnable=true
 custom_features=""
 export_filter="all_resources"
-export_path="Builds/Windows/game.exe"
+export_path="Source/Builds/Windows/game.exe"
 
 [preset.1]
-name="Linux Desktop"
-platform="Linux Desktop"
+name="Linux"
+platform="Linux"
 runnable=true
 custom_features=""
 export_filter="all_resources"
-export_path="Builds/Linux/game.x86_64"
+export_path="Source/Builds/Linux/game.x86_64"
 
 [preset.2]
 name="Web"
@@ -337,11 +337,11 @@ platform="Web"
 runnable=true
 custom_features=""
 export_filter="all_resources"
-export_path="Builds/Web/index.html"
+export_path="Source/Builds/Web/index.html"
 """
 
 MOCK_CONSOLE_LOG = """
-[GUT RUNNER] Running suite res://Source/Entities/Player/tests/test_player.gd...
+[GUT RUNNER] Running suite res://Entities/Player/tests/test_player.gd...
 [GUT RUNNER]   test_initial_charges_on_ready .................... PASSED
 [GUT RUNNER]   test_reset_charges_on_floor ...................... PASSED
 [GUT RUNNER]   test_double_jump_reduces_charges ................. PASSED
@@ -354,13 +354,13 @@ MOCK_CONSOLE_LOG = """
 [DEVOPS PIPELINE] Launching build runner...
 [DEVOPS PIPELINE] Configuring export presets for project.godot...
 [DEVOPS PIPELINE] Target Platform: Windows Desktop
-[DEVOPS PIPELINE] godot --headless --export-release "Windows Desktop" Builds/Windows/game.exe
+[DEVOPS PIPELINE] godot --headless --export-release "Windows Desktop" Source/Builds/Windows/game.exe
 [DEVOPS PIPELINE] Windows Build Complete. Artifact generated.
 [DEVOPS PIPELINE] Target Platform: Linux/X11
-[DEVOPS PIPELINE] godot --headless --export-release "Linux Desktop" Builds/Linux/game.x86_64
+[DEVOPS PIPELINE] godot --headless --export-release "Linux" Source/Builds/Linux/game.x86_64
 [DEVOPS PIPELINE] Linux Build Complete. Artifact generated.
 [DEVOPS PIPELINE] Target Platform: Web
-[DEVOPS PIPELINE] godot --headless --export-release "Web" Builds/Web/index.html
+[DEVOPS PIPELINE] godot --headless --export-release "Web" Source/Builds/Web/index.html
 [DEVOPS PIPELINE] Web Build Complete (HTML5). Artifact generated.
 [DEVOPS PIPELINE] Multi-Platform Packaging Pipeline: SUCCESS.
 """
@@ -938,6 +938,26 @@ def run_simulation(prompt):
     print(f"Goal: {prompt}")
     print(f"Target Branch: {branch_name}\n")
 
+    # Probing godot-ai MCP server status
+    import urllib.request
+    import json
+    mcp_log = ""
+    print(f"{Colors.BLUE}=== Probing godot-ai MCP Server ==={Colors.ENDC}")
+    try:
+        req = urllib.request.Request("http://127.0.0.1:8000/godot-ai/status", headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            status_data = json.loads(resp.read().decode())
+            mcp_log = (
+                f"[MCP PROBE] Found active godot-ai MCP server!\n"
+                f"[MCP PROBE] Version: {status_data.get('server_version')}\n"
+                f"[MCP PROBE] WebSocket Port: {status_data.get('ws_port')}\n"
+                f"[MCP PROBE] Tool Surface: {status_data.get('tool_surface')}\n\n"
+            )
+            print(f"  {Colors.GREEN}[OK] Connected to godot-ai MCP server (v{status_data.get('server_version')}){Colors.ENDC}\n")
+    except Exception as e:
+        mcp_log = f"[MCP PROBE] godot-ai MCP server is offline or unreachable: {str(e)}\n\n"
+        print(f"  {Colors.WARNING}Warning: godot-ai MCP server unreachable. Run Godot Editor to enable live validation.{Colors.ENDC}\n")
+
     import subprocess
     import shutil
 
@@ -1090,14 +1110,14 @@ def run_simulation(prompt):
     import subprocess
     import shutil
 
-    console_log = ""
+    console_log = mcp_log
     godot_cmd = os.environ.get("GODOT_PATH") or os.environ.get("GODOT") or shutil.which("godot")
 
     if godot_cmd:
         print(f"\n{Colors.BLUE}Executing GUT automated tests via Godot CLI...{Colors.ENDC}")
         cmd_tests = [
             godot_cmd, "--headless", "--path", "Source",
-            "-s", "res://addons/gut/gut_cmdline.gd",
+            "-s", "res://addons/gut/gut_cmdln.gd",
             "-gdir=res://Entities/Player/tests", "-gexit"
         ]
         console_log += f"$ {' '.join(cmd_tests)}\n"
@@ -1121,7 +1141,7 @@ def run_simulation(prompt):
             console_log += f"Error exporting Windows: {str(e)}\n"
 
         # Linux export
-        cmd_linux = [godot_cmd, "--headless", "--path", "Source", "--export-release", "Linux Desktop", "Builds/Linux/game.x86_64"]
+        cmd_linux = [godot_cmd, "--headless", "--path", "Source", "--export-release", "Linux", "Builds/Linux/game.x86_64"]
         console_log += f"\n$ {' '.join(cmd_linux)}\n"
         try:
             result = subprocess.run(cmd_linux, capture_output=True, text=True, timeout=30)
