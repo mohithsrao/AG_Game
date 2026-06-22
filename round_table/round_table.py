@@ -1097,7 +1097,7 @@ def run_simulation(prompt):
         print(f"\n{Colors.BLUE}Executing GUT automated tests via Godot CLI...{Colors.ENDC}")
         cmd_tests = [
             godot_cmd, "--headless", "--path", "Source",
-            "-s", "res://addons/gut/gut_cmdline.gd",
+            "-s", "res://addons/gut/gut_cmdln.gd",
             "-gdir=res://Entities/Player/tests", "-gexit"
         ]
         console_log += f"$ {' '.join(cmd_tests)}\n"

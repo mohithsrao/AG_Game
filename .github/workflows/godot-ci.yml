@@ -60,7 +60,7 @@ jobs:
       run: |
         echo "Running GUT tests..."
         # Runs GUT headlessly. Exits with GUT exit code (0 if passes, non-zero if fails).
-        godot --headless --path Source -s res://addons/gut/gut_cmdline.gd -gdir=res://Entities/Player/tests -gexit
+        godot --headless --path Source -s res://addons/gut/gut_cmdln.gd -gdir=res://Entities/Player/tests -gexit
 
     - name: Export Project Releases
       run: |
