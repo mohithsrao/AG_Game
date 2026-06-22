@@ -237,7 +237,7 @@ extends GutTest
 
 ## Automated tests for the Player double-jump mechanics.
 
-var player_scene: PackedScene = load("res://Source/Entities/Player/player.tscn")
+var player_scene: PackedScene = load("res://Entities/Player/player.tscn")
 var _player: Player = null
 
 func before_each() -> void:
@@ -341,7 +341,7 @@ export_path="Builds/Web/index.html"
 """
 
 MOCK_CONSOLE_LOG = """
-[GUT RUNNER] Running suite res://Source/Entities/Player/tests/test_player.gd...
+[GUT RUNNER] Running suite res://Entities/Player/tests/test_player.gd...
 [GUT RUNNER]   test_initial_charges_on_ready .................... PASSED
 [GUT RUNNER]   test_reset_charges_on_floor ...................... PASSED
 [GUT RUNNER]   test_double_jump_reduces_charges ................. PASSED

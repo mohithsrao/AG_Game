@@ -3,7 +3,7 @@ extends GutTest
 
 ## Automated tests for the Player double-jump mechanics.
 
-var player_scene: PackedScene = load("res://Source/Entities/Player/player.tscn")
+var player_scene: PackedScene = load("res://Entities/Player/player.tscn")
 var _player: Player = null
 
 func before_each() -> void:
