@@ -1118,7 +1118,7 @@ def run_simulation(prompt):
         cmd_tests = [
             godot_cmd, "--headless", "--path", "Source",
             "-s", "res://addons/gut/gut_cmdln.gd",
-            "-gdir=res://Entities/Player/tests", "-gexit"
+            "-gdir=res://", "-gexit"
         ]
         console_log += f"$ {' '.join(cmd_tests)}\n"
         try:
