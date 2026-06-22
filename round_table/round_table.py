@@ -134,6 +134,40 @@ graph TD
 ```
 """
 
+MOCK_IMPLEMENTATION_PLAN = """# Technical Implementation Plan: Player Double Jump
+
+This document outlines the detailed plan compiled by the Agent Round Table for implementing the double-jump mechanic.
+
+## 1. Scene Modifications
+- **File**: `Source/Entities/Player/player.tscn`
+- **Changes**:
+  - Add child node `JumpComponent` (Node, script attached: `jump_component.gd`).
+  - Add child node `AudioStreamPlayer2D` (AudioStreamPlayer2D) for swoosh sound effect.
+  - Export parameter properties on `JumpComponent` for designers.
+
+## 2. Code Changes
+- **File**: `Source/Entities/Player/player.gd`
+  - Integrate physics processing with `JumpComponent`.
+  - Expose physics parameters and handle state management (OnFloor, InAir).
+  - Connect and listen to the `double_jumped` signal to trigger VFX/SFX.
+- **File**: `Source/Entities/Player/jump_component.gd`
+  - Encapsulate velocity math, maximum charges, and charge reduction.
+  - Expose signals: `double_jumped`.
+  - Provide functions: `can_double_jump()`, `execute_double_jump()`, `reset_charges()`.
+
+## 3. Test Cases (GUT)
+- **File**: `Source/Entities/Player/tests/test_player.gd`
+  - Test case: Initial charges match max charges.
+  - Test case: Landing resets charges.
+  - Test case: Jumping reduces charges.
+  - Test case: Cannot jump when charges are exhausted.
+
+## 4. Release & DevOps
+- **File**: `Source/export_presets.cfg`
+  - Define presets for Windows, Linux, and Web.
+  - Perform automated builds and ensure zero compilation warnings.
+"""
+
 MOCK_PLAYER_GD = """# e:/Godot/Projects/AntiGravityWorkspace/AG_Game/Source/Entities/Player/player.gd
 class_name Player
 extends CharacterBody2D
@@ -746,6 +780,7 @@ DASHBOARD_TEMPLATE = """<!DOCTYPE html>
         <div class="details-section">
             <div class="tabs-header">
                 <button class="tab-btn active" onclick="switchTab(event, 'tab-code')">Code & Components</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-plan')">Implementation Plan</button>
                 <button class="tab-btn" onclick="switchTab(event, 'tab-docs')">GDD & TAD Docs</button>
                 <button class="tab-btn" onclick="switchTab(event, 'tab-tests')">Manual Verification</button>
                 <button class="tab-btn" onclick="switchTab(event, 'tab-console')">Pipeline Logs</button>
@@ -771,6 +806,12 @@ DASHBOARD_TEMPLATE = """<!DOCTYPE html>
                         <span>Source/Entities/Player/tests/test_player.gd</span>
                     </div>
                     <pre><code id="code-test"></code></pre>
+                    <br>
+                </div>
+
+                <!-- Implementation Plan Tab -->
+                <div id="tab-plan" class="tab-content markdown-body">
+                    <div id="doc-plan"></div>
                 </div>
 
                 <!-- Docs Tab -->
@@ -870,6 +911,7 @@ DASHBOARD_TEMPLATE = """<!DOCTYPE html>
                 }).join('\\n');
         }
 
+        document.getElementById('doc-plan').innerHTML = simpleMarkdown(runData.files['implementation_plan.md']);
         document.getElementById('doc-gdd').innerHTML = simpleMarkdown(runData.files['gdd.md']);
         document.getElementById('doc-tad').innerHTML = simpleMarkdown(runData.files['tad.md']);
         document.getElementById('doc-manual').innerHTML = simpleMarkdown(runData.files['manual_tests.md']);
@@ -1024,6 +1066,59 @@ def run_simulation(prompt):
         "message": f"User Feedback: '{user_feedback}'"
     })
 
+    # === Technical Planning Phase ===
+    chat_logs.extend([
+        {
+            "sender": "coordinator",
+            "message": "Ideation Phase approved! We now enter the Technical Planning Phase. Based on the finalized GDD and TAD, I request the Scene, GDScript, QA, and DevOps experts to propose their specific technical changes for implementing the double-jump mechanic. Let's start with the Scene Architect."
+        },
+        {
+            "sender": "scene_architect",
+            "message": "For the scene layout, I propose adding a new child node 'JumpComponent' (Node) and an 'AudioStreamPlayer2D' under the 'Player' (CharacterBody2D) root in 'Source/Entities/Player/player.tscn'. The JumpComponent will have its parameters like jump_height and max_double_jumps exported as properties for designers to tweak."
+        },
+        {
+            "sender": "gdscript_expert",
+            "message": "For code, I propose modifying 'Source/Entities/Player/player.gd' to integrate the JumpComponent and use an FSM state representation for physics transitions. I will also create 'Source/Entities/Player/jump_component.gd' as a class class_name JumpComponent to encapsulate the double-jump math (gravity, velocity, charge consumption). Everything will use strict static typing."
+        },
+        {
+            "sender": "qa_tester",
+            "message": "For verification, I propose creating a GUT unit test suite at 'Source/Entities/Player/tests/test_player.gd'. It will cover: 1) Initializing with correct double jump charges, 2) Depleting charges on mid-air jump execution, 3) Resetting charges when the player lands, and 4) Preventing double-jumping when charges are 0. I will also document manual test scenarios for VFX/SFX feel."
+        },
+        {
+            "sender": "devops_expert",
+            "message": "For the build pipeline, I propose verifying the 'export_presets.cfg' config and adding export targets for Windows Desktop, Linux, and Web platforms. I will run headless command-line exports to verify packaging succeeds with zero warnings."
+        },
+        {
+            "sender": "coordinator",
+            "message": "Excellent. I have compiled all your proposals into a Technical Implementation Plan and saved it to 'Documentation/TechnicalArchitecture/player_double_jump_implementation_plan.md'. User, please review the plan and provide any feedback or approval."
+        }
+    ])
+
+    print(f"\n{Colors.BLUE}=== Technical Planning Phase: Collaborative Proposals ==={Colors.ENDC}")
+    print(f"  Scene Architect: Proposing node hierarchy changes in player.tscn.")
+    print(f"  GDScript Expert: Proposing class structures and methods in player.gd & jump_component.gd.")
+    print(f"  QA Tester: Proposing GUT test suites for charge resets and physics states.")
+    print(f"  DevOps Expert: Proposing build configuration and packaging targets.")
+    print(f"  Coordinator: Compiling Technical Implementation Plan.")
+
+    plan_feedback = ""
+    if sys.stdin.isatty():
+        try:
+            plan_feedback = input("\nEnter feedback for the Technical Implementation Plan (or press Enter to approve): ").strip()
+        except (KeyboardInterrupt, EOFError):
+            print("\n[ERROR] Planning feedback interrupted. Aborting.")
+            sys.exit(1)
+    else:
+        plan_feedback = "Approved. Proceed with implementation."
+
+    if not plan_feedback:
+        plan_feedback = "Approved. Proceed with implementation."
+
+    chat_logs.append({
+        "sender": "coordinator",
+        "message": f"User Planning Feedback: '{plan_feedback}'"
+    })
+
     chat_logs.extend([
         {
             "sender": "coordinator",
@@ -1081,6 +1176,10 @@ def run_simulation(prompt):
     with open(f"{DOCS_ARCH_DIR}/player_double_jump_tad.md", "w", encoding="utf-8") as f:
         f.write(MOCK_TAD)
     print(f"  - Created {DOCS_ARCH_DIR}/player_double_jump_tad.md")
+
+    with open(f"{DOCS_ARCH_DIR}/player_double_jump_implementation_plan.md", "w", encoding="utf-8") as f:
+        f.write(MOCK_IMPLEMENTATION_PLAN)
+    print(f"  - Created {DOCS_ARCH_DIR}/player_double_jump_implementation_plan.md")
     
     with open(f"{DOCS_DESIGN_DIR}/player_double_jump_manual_tests.md", "w", encoding="utf-8") as f:
         f.write(MOCK_MANUAL_TESTS)
@@ -1118,6 +1217,12 @@ def run_simulation(prompt):
         print(f"{Colors.FAIL}[ERROR] Coordinator Gate: TAD file not found at {tad_path}!{Colors.ENDC}")
         sys.exit(1)
     print(f"  {Colors.GREEN}[OK] Coordinator Gate: TAD Verified.{Colors.ENDC}")
+
+    plan_path = f"{DOCS_ARCH_DIR}/player_double_jump_implementation_plan.md"
+    if not os.path.exists(plan_path):
+        print(f"{Colors.FAIL}[ERROR] Coordinator Gate: Implementation Plan file not found at {plan_path}!{Colors.ENDC}")
+        sys.exit(1)
+    print(f"  {Colors.GREEN}[OK] Coordinator Gate: Technical Implementation Plan Verified.{Colors.ENDC}")
 
     tscn_path = f"{SOURCE_DIR}/Player/player.tscn"
     if not os.path.exists(tscn_path):
@@ -1289,6 +1394,7 @@ def run_simulation(prompt):
             "test_player.gd": MOCK_TEST_GD,
             "gdd.md": MOCK_GDD,
             "tad.md": MOCK_TAD,
+            "implementation_plan.md": MOCK_IMPLEMENTATION_PLAN,
             "manual_tests.md": MOCK_MANUAL_TESTS
         },
         "logs": git_log + "\n" + console_log
