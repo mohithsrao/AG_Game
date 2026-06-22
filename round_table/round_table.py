@@ -985,7 +985,49 @@ def run_simulation(prompt):
     chat_logs = [
         {
             "sender": "coordinator",
-            "message": f"Welcome team to this development sprint. Our goal is to implement: '{prompt}' on branch '{branch_name}'. We will strictly adhere to our software patterns, strict static typing, modular folder structure, and three-tier GUT testing. Let's start with Game Design. Game Designer, please draft the GDD."
+            "message": f"Welcome team to the Ideation Phase for: '{prompt}' on branch '{branch_name}'. Before we begin any implementation, Game Designer and Technical Architect, let's discuss the feature concept, its feasibility, and its impact on our current codebase. Game Designer, please share your thoughts."
+        },
+        {
+            "sender": "game_designer",
+            "message": f"For the '{prompt}' feature, we need to ensure the gameplay mechanics are modular and intuitive. By implementing this as a separate component rather than bloating the Player character, we maintain decoupling. The design will specify the visual cues (VFX) and sound effects (SFX) to provide solid feedback. Technical Architect, what is the architectural impact on the current game?"
+        },
+        {
+            "sender": "technical_architect",
+            "message": "From an architectural perspective, this feature integrates perfectly with our component-based design. We will compose the Player node with a dedicated component rather than adding states directly to the Player.gd script. This avoids singleton bloating, follows Single Responsibility, and makes unit testing the state transitions trivial. Coordinator, we are ready to present this high-level design to the user for feedback."
+        },
+        {
+            "sender": "coordinator",
+            "message": f"Team, the high-level concept is ready. User, here is our proposed design and codebase impact analysis. Please provide your feedback or approval."
+        }
+    ]
+
+    print(f"\n{Colors.BLUE}=== Ideation Phase: Collaborative Discussion ==={Colors.ENDC}")
+    print(f"  Game Designer: Decoupled design with component pattern, VFX/SFX specified.")
+    print(f"  Technical Architect: Evaluating codebase impact. Decoupling movement logic via JumpComponent.")
+    print(f"  Coordinator: Presenting design and architectural impact to the user.")
+
+    user_feedback = ""
+    if sys.stdin.isatty():
+        try:
+            user_feedback = input("\nEnter feedback for the Game Designer and Architect during the Ideation Phase (or press Enter to approve): ").strip()
+        except (KeyboardInterrupt, EOFError):
+            print("\n[ERROR] Ideation feedback interrupted. Aborting.")
+            sys.exit(1)
+    else:
+        user_feedback = "Approved. Proceed with GDD and TAD."
+
+    if not user_feedback:
+        user_feedback = "Approved. Proceed with GDD and TAD."
+
+    chat_logs.append({
+        "sender": "coordinator",
+        "message": f"User Feedback: '{user_feedback}'"
+    })
+
+    chat_logs.extend([
+        {
+            "sender": "coordinator",
+            "message": "Thank you for the feedback. Based on our discussion and your approval, we have finalized the GDD and TAD. Game Designer and Technical Architect, please compile the output documents."
         },
         {
             "sender": "game_designer",
@@ -993,11 +1035,11 @@ def run_simulation(prompt):
         },
         {
             "sender": "qa_tester",
-            "message": "Thank you. I have written the Shift-Left test plan. Since we are testing jump physics and states, we will structure Unit Tests for JumpComponent charges, Integration Tests for Player-JumpComponent interactions, and E2E simulation tests for floor-to-air physics state transitions. This has been added to our QA objectives. Technical Architect, please review and outline the TAD."
+            "message": "Thank you. I have written the Shift-Left test plan. Since we are testing jump physics and states, we will structure Unit Tests for JumpComponent charges, Integration Tests for Player-JumpComponent interactions, and E2E simulation tests for floor-to-air physics state transitions. This has been added to our QA objectives. Technical Architect, please review and verify the TAD."
         },
         {
             "sender": "technical_architect",
-            "message": "Excellent design. The TAD is complete and saved to 'Documentation/TechnicalArchitecture/player_double_jump_tad.md'. The architecture utilizes the Component Pattern (JumpComponent) and a Finite State Machine for state separation, decoupling input from physics logic. This is test-friendly and avoids singleton bloating. GDScript and Scene Experts, you are clear to proceed with implementation."
+            "message": "Excellent. The TAD is complete and saved to 'Documentation/TechnicalArchitecture/player_double_jump_tad.md'. The architecture utilizes the Component Pattern (JumpComponent) and a Finite State Machine for state separation, decoupling input from physics logic. This is test-friendly and avoids singleton bloating. GDScript and Scene Experts, you are clear to proceed with implementation."
         },
         {
             "sender": "scene_architect",
@@ -1017,9 +1059,9 @@ def run_simulation(prompt):
         },
         {
             "sender": "coordinator",
-            "message": "Phenomenal work, team! GDD/TAD docs generated, modular scripts created, tests passed, and multi-platform packaging executed. The task is fully complete. Generating the final interactive round table report..."
+            "message": "Phenomenal work, team! Ideation completed with GDD & TAD outputs, modular scripts created, tests passed, and multi-platform packaging executed. The task is fully complete. Generating the final interactive round table report..."
         }
-    ]
+    ])
 
     # Create directories if they do not exist
     os.makedirs(DOCS_DESIGN_DIR, exist_ok=True)
