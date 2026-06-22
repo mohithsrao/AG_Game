@@ -1132,7 +1132,7 @@ def run_simulation(prompt):
 
         print(f"{Colors.BLUE}Executing DevOps exports via Godot CLI...{Colors.ENDC}")
         # Windows export
-        cmd_win = [godot_cmd, "--headless", "--path", "Source", "--export-release", "Windows Desktop", "Source/Builds/Windows/game.exe"]
+        cmd_win = [godot_cmd, "--headless", "--path", "Source", "--export-release", "Windows Desktop", "Builds/Windows/game.exe"]
         console_log += f"\n$ {' '.join(cmd_win)}\n"
         try:
             result = subprocess.run(cmd_win, capture_output=True, text=True, timeout=30)
@@ -1141,7 +1141,7 @@ def run_simulation(prompt):
             console_log += f"Error exporting Windows: {str(e)}\n"
 
         # Linux export
-        cmd_linux = [godot_cmd, "--headless", "--path", "Source", "--export-release", "Linux", "Source/Builds/Linux/game.x86_64"]
+        cmd_linux = [godot_cmd, "--headless", "--path", "Source", "--export-release", "Linux", "Builds/Linux/game.x86_64"]
         console_log += f"\n$ {' '.join(cmd_linux)}\n"
         try:
             result = subprocess.run(cmd_linux, capture_output=True, text=True, timeout=30)
@@ -1150,7 +1150,7 @@ def run_simulation(prompt):
             console_log += f"Error exporting Linux: {str(e)}\n"
 
         # Web export
-        cmd_web = [godot_cmd, "--headless", "--path", "Source", "--export-release", "Web", "Source/Builds/Web/index.html"]
+        cmd_web = [godot_cmd, "--headless", "--path", "Source", "--export-release", "Web", "Builds/Web/index.html"]
         console_log += f"\n$ {' '.join(cmd_web)}\n"
         try:
             result = subprocess.run(cmd_web, capture_output=True, text=True, timeout=45)

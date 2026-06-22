@@ -70,13 +70,13 @@ jobs:
         mkdir -p Source/Builds/Web
 
         echo "Exporting for Windows Desktop..."
-        godot --headless --path Source --export-release "Windows Desktop" Source/Builds/Windows/game.exe
+        godot --headless --path Source --export-release "Windows Desktop" Builds/Windows/game.exe
 
         echo "Exporting for Linux Desktop..."
-        godot --headless --path Source --export-release "Linux" Source/Builds/Linux/game.x86_64
+        godot --headless --path Source --export-release "Linux" Builds/Linux/game.x86_64
 
         echo "Exporting for Web (HTML5)..."
-        godot --headless --path Source --export-release "Web" Source/Builds/Web/index.html
+        godot --headless --path Source --export-release "Web" Builds/Web/index.html
 
     - name: Upload Export Artifacts
       uses: actions/upload-artifact@v4
