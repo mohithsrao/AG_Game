@@ -79,6 +79,20 @@ PERSONAS = {
         "color": "#06b6d4",
         "avatar": "🚀",
         "accent": "#0891b2"
+    },
+    "vfx_expert": {
+        "name": "VFX Expert",
+        "title": "Visual Effects & Shader Artist",
+        "color": "#ec4899",
+        "avatar": "✨",
+        "accent": "#db2777"
+    },
+    "sfx_expert": {
+        "name": "SFX Expert",
+        "title": "Sound Effects & Audio Designer",
+        "color": "#14b8a6",
+        "avatar": "🎵",
+        "accent": "#0d9488"
     }
 }
 
@@ -166,6 +180,25 @@ This document outlines the detailed plan compiled by the Agent Round Table for i
 - **File**: `Source/export_presets.cfg`
   - Define presets for Windows, Linux, and Web.
   - Perform automated builds and ensure zero compilation warnings.
+"""
+
+MOCK_VFX_TRES = """[gd_resource type="ParticleProcessMaterial" format=3 uid="uid://vfx1y2x3w4v5"]
+
+[resource]
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = 50.0
+initial_velocity_max = 120.0
+gravity = Vector3(0, 98, 0)
+scale_min = 0.5
+scale_max = 1.2
+color = Color(0.88, 0.92, 0.95, 1)
+# Generated using AI Texture and Shader Synthesis tool.
+"""
+
+MOCK_SFX_WAV = """RIFF    WAVEfmt         data    
+# AI Generated Audio Data placeholder (WAV format, 16-bit, 44.1kHz).
+# Generated using AI Sound Synthesis tool.
 """
 
 MOCK_PLAYER_GD = """# e:/Godot/Projects/AntiGravityWorkspace/AG_Game/Source/Entities/Player/player.gd
@@ -807,6 +840,18 @@ DASHBOARD_TEMPLATE = """<!DOCTYPE html>
                     </div>
                     <pre><code id="code-test"></code></pre>
                     <br>
+                    <div class="code-file-header">
+                        <span>vfx_double_jump.tres</span>
+                        <span>Source/Entities/Player/vfx_double_jump.tres</span>
+                    </div>
+                    <pre><code id="code-vfx"></code></pre>
+                    <br>
+                    <div class="code-file-header">
+                        <span>sfx_double_jump.wav</span>
+                        <span>Source/Entities/Player/sfx_double_jump.wav</span>
+                    </div>
+                    <pre><code id="code-sfx"></code></pre>
+                    <br>
                 </div>
 
                 <!-- Implementation Plan Tab -->
@@ -892,6 +937,8 @@ DASHBOARD_TEMPLATE = """<!DOCTYPE html>
         document.getElementById('code-player').innerText = runData.files['player.gd'];
         document.getElementById('code-jump').innerText = runData.files['jump_component.gd'];
         document.getElementById('code-test').innerText = runData.files['test_player.gd'];
+        document.getElementById('code-vfx').innerText = runData.files['vfx_double_jump.tres'];
+        document.getElementById('code-sfx').innerText = runData.files['sfx_double_jump.wav'];
 
         // Simple Markdown Parsers
         function simpleMarkdown(md) {
@@ -1027,11 +1074,19 @@ def run_simulation(prompt):
     chat_logs = [
         {
             "sender": "coordinator",
-            "message": f"Welcome team to the Ideation Phase for: '{prompt}' on branch '{branch_name}'. Before we begin any implementation, Game Designer and Technical Architect, let's discuss the feature concept, its feasibility, and its impact on our current codebase. Game Designer, please share your thoughts."
+            "message": f"Welcome team to the Ideation Phase for: '{prompt}' on branch '{branch_name}'. Before we begin any implementation, Game Designer, Technical Architect, VFX and SFX Experts, let's discuss the feature concept, its feasibility, and its impact. Game Designer, please share your thoughts."
         },
         {
             "sender": "game_designer",
-            "message": f"For the '{prompt}' feature, we need to ensure the gameplay mechanics are modular and intuitive. By implementing this as a separate component rather than bloating the Player character, we maintain decoupling. The design will specify the visual cues (VFX) and sound effects (SFX) to provide solid feedback. Technical Architect, what is the architectural impact on the current game?"
+            "message": f"For the '{prompt}' feature, we need to ensure the gameplay mechanics are modular and intuitive. By implementing this as a separate component rather than bloating the Player character, we maintain decoupling. We need good visual cues (VFX) and sound effects (SFX) to provide solid feedback. VFX and SFX experts, what can we propose?"
+        },
+        {
+            "sender": "vfx_expert",
+            "message": "For the visual feedback, I propose generating a stylized dust particle effect texture using an AI generation model (e.g. Stable Diffusion). We can use this as a sprite texture in a GPUParticles2D node to spawn a cloud of dust when the double jump occurs. This keeps the asset lightweight and highly customized."
+        },
+        {
+            "sender": "sfx_expert",
+            "message": "For audio, I propose using an AI audio synthesis tool (e.g. Stable Audio) to synthesize a sharp wind 'whoosh' sound effect. We'll save it as 'sfx_double_jump.wav' inside the Player directory and play it upon double jump execution. This will give excellent auditory confirmation of the action."
         },
         {
             "sender": "technical_architect",
@@ -1045,6 +1100,8 @@ def run_simulation(prompt):
 
     print(f"\n{Colors.BLUE}=== Ideation Phase: Collaborative Discussion ==={Colors.ENDC}")
     print(f"  Game Designer: Decoupled design with component pattern, VFX/SFX specified.")
+    print(f"  VFX Expert: Proposing AI-generated dust particle texture.")
+    print(f"  SFX Expert: Proposing AI-synthesized swoosh WAV audio.")
     print(f"  Technical Architect: Evaluating codebase impact. Decoupling movement logic via JumpComponent.")
     print(f"  Coordinator: Presenting design and architectural impact to the user.")
 
@@ -1070,11 +1127,19 @@ def run_simulation(prompt):
     chat_logs.extend([
         {
             "sender": "coordinator",
-            "message": "Ideation Phase approved! We now enter the Technical Planning Phase. Based on the finalized GDD and TAD, I request the Scene, GDScript, QA, and DevOps experts to propose their specific technical changes for implementing the double-jump mechanic. Let's start with the Scene Architect."
+            "message": "Ideation Phase approved! We now enter the Technical Planning Phase. Based on the finalized GDD and TAD, I request the Scene, GDScript, QA, DevOps, VFX, and SFX experts to propose their specific technical changes for implementing the double-jump mechanic. Let's start with the VFX and SFX Experts."
+        },
+        {
+            "sender": "vfx_expert",
+            "message": "I propose creating a ParticleProcessMaterial saved as 'Source/Entities/Player/vfx_double_jump.tres'. I will define gravity, velocity, and color ramp parameters inside it to simulate a dust cloud blowing downwards. I'll use the AI-generated texture as the particle's canvas."
+        },
+        {
+            "sender": "sfx_expert",
+            "message": "I propose setting up an AudioStreamPlayer2D child node under the Player root in the scene, and configuring it to use the AI-synthesized 'sfx_double_jump.wav' stream. I'll also route it to the 'SFX' audio bus in the project."
         },
         {
             "sender": "scene_architect",
-            "message": "For the scene layout, I propose adding a new child node 'JumpComponent' (Node) and an 'AudioStreamPlayer2D' under the 'Player' (CharacterBody2D) root in 'Source/Entities/Player/player.tscn'. The JumpComponent will have its parameters like jump_height and max_double_jumps exported as properties for designers to tweak."
+            "message": "For the scene layout, I propose adding a new child node 'JumpComponent' (Node), a 'GPUParticles2D' node with the 'vfx_double_jump.tres' material assigned, and an 'AudioStreamPlayer2D' under the 'Player' (CharacterBody2D) root in 'Source/Entities/Player/player.tscn'. The JumpComponent will have its parameters like jump_height and max_double_jumps exported as properties for designers to tweak."
         },
         {
             "sender": "gdscript_expert",
@@ -1095,6 +1160,8 @@ def run_simulation(prompt):
     ])
 
     print(f"\n{Colors.BLUE}=== Technical Planning Phase: Collaborative Proposals ==={Colors.ENDC}")
+    print(f"  VFX Expert: Proposing ParticleProcessMaterial and AI-generated dust texture.")
+    print(f"  SFX Expert: Proposing AudioStreamPlayer2D trigger and AI sound synthesis.")
     print(f"  Scene Architect: Proposing node hierarchy changes in player.tscn.")
     print(f"  GDScript Expert: Proposing class structures and methods in player.gd & jump_component.gd.")
     print(f"  QA Tester: Proposing GUT test suites for charge resets and physics states.")
@@ -1134,11 +1201,19 @@ def run_simulation(prompt):
         },
         {
             "sender": "technical_architect",
-            "message": "Excellent. The TAD is complete and saved to 'Documentation/TechnicalArchitecture/player_double_jump_tad.md'. The architecture utilizes the Component Pattern (JumpComponent) and a Finite State Machine for state separation, decoupling input from physics logic. This is test-friendly and avoids singleton bloating. GDScript and Scene Experts, you are clear to proceed with implementation."
+            "message": "Excellent. The TAD is complete and saved to 'Documentation/TechnicalArchitecture/player_double_jump_tad.md'. The architecture utilizes the Component Pattern (JumpComponent) and a Finite State Machine for state separation, decoupling input from physics logic. This is test-friendly and avoids singleton bloating. VFX and SFX Experts, please run your AI tools to generate the feedback resources."
+        },
+        {
+            "sender": "vfx_expert",
+            "message": "AI Image Generator tool run completed successfully! I synthesized a circular particle texture, configured the emission parameters, and created 'Source/Entities/Player/vfx_double_jump.tres' containing the ParticleProcessMaterial configuration. Ready for scene layout integration."
+        },
+        {
+            "sender": "sfx_expert",
+            "message": "AI Sound Synthesis tool run completed successfully! I generated a high-fidelity wind swoosh sound effect, exported it in uncompressed WAV format, and saved it to 'Source/Entities/Player/sfx_double_jump.wav'. Ready for player audio streams."
         },
         {
             "sender": "scene_architect",
-            "message": "I have created the node hierarchy inside the modular folder 'Source/Entities/Player/player.tscn'. The structure is Player (CharacterBody2D) -> CollisionShape2D, AnimatedSprite2D, JumpComponent, and AudioStreamPlayer2D. The JumpComponent handles its own properties, which are exported for design tweaking. GDScript Expert, the scene setup is ready."
+            "message": "I have created the node hierarchy inside the modular folder 'Source/Entities/Player/player.tscn'. The structure is Player (CharacterBody2D) -> CollisionShape2D, AnimatedSprite2D, JumpComponent, GPUParticles2D (using vfx_double_jump.tres), and AudioStreamPlayer2D (using sfx_double_jump.wav). The JumpComponent handles its own properties, which are exported for design tweaking. GDScript Expert, the scene setup is ready."
         },
         {
             "sender": "gdscript_expert",
@@ -1154,7 +1229,7 @@ def run_simulation(prompt):
         },
         {
             "sender": "coordinator",
-            "message": "Phenomenal work, team! Ideation completed with GDD & TAD outputs, modular scripts created, tests passed, and multi-platform packaging executed. The task is fully complete. Generating the final interactive round table report..."
+            "message": "Phenomenal work, team! Ideation completed with GDD & TAD outputs, AI tools successfully generated VFX/SFX feedback assets, modular scripts created, tests passed, and multi-platform packaging executed. The task is fully complete. Generating the final interactive round table report..."
         }
     ])
 
@@ -1203,6 +1278,16 @@ def run_simulation(prompt):
         f.write(MOCK_TSCN)
     print(f"  - Created {SOURCE_DIR}/Player/player.tscn")
 
+    # VFX Expert generated material
+    with open(f"{SOURCE_DIR}/Player/vfx_double_jump.tres", "w", encoding="utf-8") as f:
+        f.write(MOCK_VFX_TRES)
+    print(f"  - Created {SOURCE_DIR}/Player/vfx_double_jump.tres")
+
+    # SFX Expert generated sound
+    with open(f"{SOURCE_DIR}/Player/sfx_double_jump.wav", "w", encoding="utf-8") as f:
+        f.write(MOCK_SFX_WAV)
+    print(f"  - Created {SOURCE_DIR}/Player/sfx_double_jump.wav")
+
     # 1. Coordinator Step-by-Step Gate Validations
     print(f"\n{Colors.BLUE}=== Coordinator File Verification Gates ==={Colors.ENDC}")
     
@@ -1229,6 +1314,18 @@ def run_simulation(prompt):
         print(f"{Colors.FAIL}[ERROR] Coordinator Gate: player.tscn file not found at {tscn_path}!{Colors.ENDC}")
         sys.exit(1)
     print(f"  {Colors.GREEN}[OK] Coordinator Gate: player.tscn Scene file Verified.{Colors.ENDC}")
+
+    vfx_file_path = f"{SOURCE_DIR}/Player/vfx_double_jump.tres"
+    if not os.path.exists(vfx_file_path):
+        print(f"{Colors.FAIL}[ERROR] Coordinator Gate: VFX material file not found at {vfx_file_path}!{Colors.ENDC}")
+        sys.exit(1)
+    print(f"  {Colors.GREEN}[OK] Coordinator Gate: VFX Material File Verified.{Colors.ENDC}")
+
+    sfx_file_path = f"{SOURCE_DIR}/Player/sfx_double_jump.wav"
+    if not os.path.exists(sfx_file_path):
+        print(f"{Colors.FAIL}[ERROR] Coordinator Gate: SFX sound file not found at {sfx_file_path}!{Colors.ENDC}")
+        sys.exit(1)
+    print(f"  {Colors.GREEN}[OK] Coordinator Gate: SFX Audio File Verified.{Colors.ENDC}")
 
     player_gd = f"{SOURCE_DIR}/Player/player.gd"
     jump_gd = f"{SOURCE_DIR}/Player/jump_component.gd"
@@ -1394,6 +1491,8 @@ def run_simulation(prompt):
             "test_player.gd": MOCK_TEST_GD,
             "gdd.md": MOCK_GDD,
             "tad.md": MOCK_TAD,
+            "vfx_double_jump.tres": MOCK_VFX_TRES,
+            "sfx_double_jump.wav": MOCK_SFX_WAV,
             "implementation_plan.md": MOCK_IMPLEMENTATION_PLAN,
             "manual_tests.md": MOCK_MANUAL_TESTS
         },
