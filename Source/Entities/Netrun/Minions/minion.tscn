@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://c6b68a8bc8aa"]
+
+[ext_resource type="Script" path="res://Entities/Netrun/Minions/minion.gd" id="1_minion"]
+[ext_resource type="Script" path="res://Entities/Netrun/Minions/Components/routing_component.gd" id="2_routing"]
+[ext_resource type="Script" path="res://Entities/Netrun/Shared/Components/health_component.gd" id="3_health"]
+[ext_resource type="Script" path="res://Entities/Netrun/Minions/Components/shield_component.gd" id="4_shield"]
+[ext_resource type="Script" path="res://Entities/Netrun/Minions/Components/stealth_component.gd" id="5_stealth"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 8.0
+
+[node name="Minion" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_minion")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_1")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="RoutingComponent" type="Node" parent="."]
+script = ExtResource("2_routing")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_health")
+
+[node name="ShieldComponent" type="Node" parent="."]
+script = ExtResource("4_shield")
+
+[node name="StealthComponent" type="Node" parent="."]
+script = ExtResource("5_stealth")

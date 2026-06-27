@@ -19,3 +19,6 @@ Source/mono_crash.*.json
 # Builds
 Builds/
 Source/TestOutput/
+version.log
+test_run.log
+test_run_direct.log

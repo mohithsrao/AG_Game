@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://dmre43c83ada"]
+
+[ext_resource type="Script" path="res://Entities/Netrun/Spawners/port_spawner.gd" id="1_spawner"]
+
+[node name="PortSpawner" type="Node2D"]
+script = ExtResource("1_spawner")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
