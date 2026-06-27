@@ -1,0 +1,91 @@
+name: Godot CI/CD Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  GODOT_VERSION: "4.7"
+  GODOT_STATUS: "stable"
+
+jobs:
+  build-and-test:
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Cache Godot Editor & Templates
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.local/share/godot/export_templates/
+          /usr/local/bin/godot
+        key: godot-${{ env.GODOT_VERSION }}-${{ env.GODOT_STATUS }}
+        restore-keys: |
+          godot-${{ env.GODOT_VERSION }}-
+
+    - name: Install Godot and Export Templates
+      run: |
+        # If godot is already in path, skip download
+        if ! command -v godot &> /dev/null; then
+          echo "Godot not found in cache, downloading..."
+          wget -q https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-${{ env.GODOT_STATUS }}/Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_STATUS }}_linux.x86_64.zip
+          unzip Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_STATUS }}_linux.x86_64.zip
+          mv Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_STATUS }}_linux.x86_64 godot
+          sudo mv godot /usr/local/bin/godot
+          rm Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_STATUS }}_linux.x86_64.zip
+        else
+          echo "Godot found in cache."
+        fi
+
+        # Check export templates
+        TEMPLATE_PATH=~/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.${{ env.GODOT_STATUS }}
+        if [ ! -d "$TEMPLATE_PATH" ]; then
+          echo "Export templates not found in cache, downloading..."
+          wget -q https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-${{ env.GODOT_STATUS }}/Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_STATUS }}_export_templates.tpz
+          unzip Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_STATUS }}_export_templates.tpz -d /tmp
+          mkdir -p "$TEMPLATE_PATH"
+          mv /tmp/templates/* "$TEMPLATE_PATH"/
+          rm Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_STATUS }}_export_templates.tpz
+        else
+          echo "Export templates found in cache."
+        fi
+
+    - name: Run GUT Automated Tests
+      run: |
+        echo "Running GUT tests..."
+        # Runs GUT headlessly. Exits with GUT exit code (0 if passes, non-zero if fails).
+        godot --headless --path Source -s res://addons/gut/gut_cmdln.gd -gdir=res:// -gexit
+
+    - name: Export Project Releases
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        echo "Preparing build folders..."
+        mkdir -p Source/Builds/Windows
+        mkdir -p Source/Builds/Linux
+        mkdir -p Source/Builds/Web
+
+        echo "Exporting for Windows Desktop..."
+        godot --headless --path Source --export-release "Windows Desktop" Builds/Windows/game.exe
+
+        echo "Exporting for Linux Desktop..."
+        godot --headless --path Source --export-release "Linux" Builds/Linux/game.x86_64
+
+        echo "Exporting for Web (HTML5)..."
+        godot --headless --path Source --export-release "Web" Builds/Web/index.html
+
+    - name: Upload Export Artifacts
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: actions/upload-artifact@v4
+      with:
+        name: godot-release-builds
+        path: Source/Builds/
+        if-no-files-found: error
