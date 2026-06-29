@@ -9,6 +9,7 @@ const HealthComponentScript = preload("../Shared/Components/health_component.gd"
 const ShieldComponentScript = preload("../Minions/Components/shield_component.gd")
 const StealthComponentScript = preload("../Minions/Components/stealth_component.gd")
 const RoutingComponentScript = preload("../Minions/Components/routing_component.gd")
+const SteeringComponentScript = preload("../Minions/Components/steering_component.gd")
 
 func _create_composed_minion() -> CharacterBody2D:
 	var minion = MinionScript.new()
@@ -16,6 +17,10 @@ func _create_composed_minion() -> CharacterBody2D:
 	var routing = RoutingComponentScript.new()
 	routing.name = "RoutingComponent"
 	minion.add_child(routing)
+	
+	var steering = SteeringComponentScript.new()
+	steering.name = "SteeringComponent"
+	minion.add_child(steering)
 	
 	var health = HealthComponentScript.new()
 	health.name = "HealthComponent"

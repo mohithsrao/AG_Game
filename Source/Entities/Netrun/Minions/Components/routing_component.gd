@@ -1,16 +1,17 @@
 # routing_component.gd
+class_name RoutingComponent
 extends Node
 
-## Executes pathing strategies to calculate velocity vectors for minions.
+## Executes pathing strategies to calculate target waypoints for minions.
 
-const RoutingStrategy = preload("res://Entities/Netrun/Shared/Resources/routing_strategy.gd")
+@export var strategy: RoutingStrategy
 
-@export var strategy: Resource # RoutingStrategy resource
-
-func set_strategy(new_strategy: Resource) -> void:
+func set_strategy(new_strategy: RoutingStrategy) -> void:
 	strategy = new_strategy
 
-func get_velocity(pos: Vector2, target: Vector2, speed: float, delta: float) -> Vector2:
-	if is_instance_valid(strategy) and strategy.has_method("get_next_velocity"):
-		return strategy.get_next_velocity(pos, target, speed, delta)
-	return pos.direction_to(target) * speed
+func get_waypoint(pos: Vector2, target: Vector2) -> Vector2:
+	if is_instance_valid(strategy):
+		return strategy.get_next_waypoint(pos, target)
+	return target
+
+
