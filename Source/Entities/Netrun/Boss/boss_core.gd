@@ -34,6 +34,8 @@ var health_component = HealthComponent.new()
 var rotator_component = RotatorComponent.new()
 var purge_area: Area2D = Area2D.new()
 
+@onready var animation_player = get_node_or_null("AnimationPlayer")
+
 func _init() -> void:
 	# Configure health component defaults
 	health_component.max_health = max_health
@@ -64,6 +66,9 @@ func _ready() -> void:
 	collision.shape = circle
 	purge_area.add_child(collision)
 	collision.disabled = true
+	
+	if is_instance_valid(animation_player):
+		animation_player.play("Boss_Idle")
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_PREDELETE:
@@ -104,12 +109,18 @@ func trigger_buffer_overflow() -> void:
 	stun_timer = stun_duration
 	ddos_hit_count = 0
 	NetrunEvents.boss_stunned.emit()
+	
+	if is_instance_valid(animation_player):
+		animation_player.play("Boss_Stun")
 
 func recover_from_stun() -> void:
 	current_state = State.SYSTEM_PURGE
 	trigger_system_purge()
 	current_state = State.ACTIVE
 	NetrunEvents.boss_recovered.emit()
+	
+	if is_instance_valid(animation_player):
+		animation_player.play("Boss_Idle")
 
 func trigger_system_purge() -> void:
 	var collision: CollisionShape2D = purge_area.get_child(0) as CollisionShape2D
@@ -129,6 +140,13 @@ func trigger_system_purge() -> void:
 func take_damage(amount: float) -> void:
 	var multiplier: float = 2.0 if current_state == State.BUFFER_OVERFLOW else 1.0
 	health_component.take_damage(amount * multiplier)
+	
+	if is_instance_valid(animation_player):
+		animation_player.play("Boss_Hit")
+		if current_state == State.BUFFER_OVERFLOW:
+			animation_player.queue("Boss_Stun")
+		else:
+			animation_player.queue("Boss_Idle")
 
 func destroy_core() -> void:
 	current_state = State.DESTROYED

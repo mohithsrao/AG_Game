@@ -16,6 +16,7 @@ const MinionManager = preload("res://Entities/Netrun/Minions/minion_manager.gd")
 @onready var health_component = $HealthComponent
 @onready var shield_component = $ShieldComponent
 @onready var stealth_component = $StealthComponent
+@onready var sprite_2d = get_node_or_null("Sprite2D")
 
 var speed_multiplier: float = 1.0
 var has_firewall_immunity: bool = false
@@ -32,6 +33,8 @@ func _ready() -> void:
 	var manager = get_tree().get_first_node_in_group("minion_managers")
 	if manager and manager.has_method("register_minion"):
 		manager.register_minion(self)
+		
+	_update_minion_sprite()
 
 func _physics_process(delta: float) -> void:
 	if not minion_data:
@@ -46,6 +49,10 @@ func _physics_process(delta: float) -> void:
 	)
 	velocity = target_velocity
 	move_and_slide()
+	
+	# Align sprite rotation to movement angle
+	if velocity.length_squared() > 1.0 and is_instance_valid(sprite_2d):
+		sprite_2d.rotation = velocity.angle()
 
 func get_target_position() -> Vector2:
 	var boss: Node2D = get_tree().get_first_node_in_group("boss") as Node2D
@@ -56,9 +63,11 @@ func take_damage(amount: float) -> void:
 		return
 		
 	if is_instance_valid(shield_component) and shield_component.absorb_damage():
+		_update_minion_sprite() # Swap sprite when shield breaks
 		return
 		
 	if is_instance_valid(health_component):
+		print_debug(self, "Has taken damamge : " + str(amount))
 		health_component.take_damage(amount)
 
 func apply_syscall_effect(syscall: NetrunTypes.SyscallType) -> void:
@@ -70,7 +79,7 @@ func apply_syscall_effect(syscall: NetrunTypes.SyscallType) -> void:
 			speed_multiplier = 1.0
 			has_firewall_immunity = false
 		NetrunTypes.SyscallType.PING_DDoS_DETONATE:
-			if minion_data and minion_data.minion_name == "DDoS Packet":
+			if minion_data and (minion_data.minion_name == "HTTP Packet" or minion_data.minion_name == "DDoS Packet"):
 				detonate_payload()
 
 func detonate_payload() -> void:
@@ -78,6 +87,24 @@ func detonate_payload() -> void:
 	if boss and boss.has_method("apply_ddos_hit") and minion_data:
 		boss.apply_ddos_hit(int(minion_data.ddos_value))
 	_on_died()
+
+func _update_minion_sprite() -> void:
+	if not is_instance_valid(sprite_2d) or not minion_data:
+		return
+		
+	var region := Rect2(10, 45, 85, 70)
+	match minion_data.minion_name:
+		"HTTP Packet", "DDoS Packet":
+			region = Rect2(10, 45, 85, 70)
+		"HTTPS Packet", "Trojan Horse":
+			if is_instance_valid(shield_component) and shield_component.is_shielded:
+				region = Rect2(190, 195, 85, 70)
+			else:
+				region = Rect2(190, 45, 85, 70)
+		"SSH Packet", "Logic Bomb":
+			region = Rect2(280, 45, 85, 70)
+			
+	sprite_2d.region_rect = region
 
 func _on_died() -> void:
 	var manager = get_tree().get_first_node_in_group("minion_managers")

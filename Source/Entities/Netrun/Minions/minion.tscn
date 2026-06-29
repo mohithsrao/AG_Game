@@ -1,32 +1,36 @@
 [gd_scene format=3 uid="uid://c6b68a8bc8aa"]
 
-[ext_resource type="Script" path="res://Entities/Netrun/Minions/minion.gd" id="1_minion"]
-[ext_resource type="Script" path="res://Entities/Netrun/Minions/Components/routing_component.gd" id="2_routing"]
-[ext_resource type="Script" path="res://Entities/Netrun/Shared/Components/health_component.gd" id="3_health"]
-[ext_resource type="Script" path="res://Entities/Netrun/Minions/Components/shield_component.gd" id="4_shield"]
-[ext_resource type="Script" path="res://Entities/Netrun/Minions/Components/stealth_component.gd" id="5_stealth"]
+[ext_resource type="Script" uid="uid://dhnmgge4cvyfd" path="res://Entities/Netrun/Minions/minion.gd" id="1_minion"]
+[ext_resource type="Script" uid="uid://qrys1hivqmfu" path="res://Entities/Netrun/Minions/Components/routing_component.gd" id="2_routing"]
+[ext_resource type="Script" uid="uid://bek7871cuqa58" path="res://Entities/Netrun/Shared/Components/health_component.gd" id="3_health"]
+[ext_resource type="Script" uid="uid://udbuyhl1ubxq" path="res://Entities/Netrun/Minions/Components/shield_component.gd" id="4_shield"]
+[ext_resource type="Script" uid="uid://56bpkiher0rg" path="res://Entities/Netrun/Minions/Components/stealth_component.gd" id="5_stealth"]
+[ext_resource type="Texture2D" uid="uid://dtwltmrwe6kxb" path="res://Assets/Sprites/minion_sheet.png" id="6_sheet"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 8.0
 
-[node name="Minion" type="CharacterBody2D"]
+[node name="Minion" type="CharacterBody2D" unique_id=2004000118]
 collision_layer = 4
 collision_mask = 2
 script = ExtResource("1_minion")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=445496806]
 shape = SubResource("CircleShape2D_1")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=79662409]
+texture = ExtResource("6_sheet")
+region_enabled = true
+region_rect = Rect2(18, 68, 56, 54)
 
-[node name="RoutingComponent" type="Node" parent="."]
+[node name="RoutingComponent" type="Node" parent="." unique_id=117874443]
 script = ExtResource("2_routing")
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1639330408]
 script = ExtResource("3_health")
 
-[node name="ShieldComponent" type="Node" parent="."]
+[node name="ShieldComponent" type="Node" parent="." unique_id=408941256]
 script = ExtResource("4_shield")
 
-[node name="StealthComponent" type="Node" parent="."]
+[node name="StealthComponent" type="Node" parent="." unique_id=938484285]
 script = ExtResource("5_stealth")

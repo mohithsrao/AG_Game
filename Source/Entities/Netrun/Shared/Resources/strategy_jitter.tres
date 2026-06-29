@@ -1,0 +1,8 @@
+[gd_resource type="Resource" format=3 uid="uid://dmr7283c75a3"]
+
+[ext_resource type="Script" path="res://Entities/Netrun/Shared/Resources/strategy_jitter.gd" id="1_jitter"]
+
+[resource]
+script = ExtResource("1_jitter")
+amplitude = 120.0
+frequency = 0.02

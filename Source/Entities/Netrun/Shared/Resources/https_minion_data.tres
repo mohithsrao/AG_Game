@@ -1,0 +1,12 @@
+[gd_resource type="Resource" format=3 uid="uid://dmre28372a01"]
+
+[ext_resource type="Script" path="res://Entities/Netrun/Shared/Resources/minion_data.gd" id="1_data"]
+[ext_resource type="Resource" path="res://Entities/Netrun/Shared/Resources/strategy_direct.tres" id="2_strategy"]
+
+[resource]
+script = ExtResource("1_data")
+minion_name = "HTTPS Packet"
+base_speed = 100.0
+base_health = 15.0
+ddos_value = 1.0
+routing_strategy = ExtResource("2_strategy")

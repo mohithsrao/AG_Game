@@ -1,0 +1,6 @@
+[gd_resource type="Resource" format=3 uid="uid://df7283c7133a"]
+
+[ext_resource type="Script" path="res://Entities/Netrun/Shared/Resources/strategy_direct.gd" id="1_direct"]
+
+[resource]
+script = ExtResource("1_direct")
