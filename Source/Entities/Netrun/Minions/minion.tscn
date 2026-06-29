@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://bek7871cuqa58" path="res://Entities/Netrun/Shared/Components/health_component.gd" id="3_health"]
 [ext_resource type="Script" uid="uid://udbuyhl1ubxq" path="res://Entities/Netrun/Minions/Components/shield_component.gd" id="4_shield"]
 [ext_resource type="Script" uid="uid://56bpkiher0rg" path="res://Entities/Netrun/Minions/Components/stealth_component.gd" id="5_stealth"]
+[ext_resource type="Script" path="res://Entities/Netrun/Minions/Components/steering_component.gd" id="7_steering"]
 [ext_resource type="Texture2D" uid="uid://dtwltmrwe6kxb" path="res://Assets/Sprites/minion_sheet.png" id="6_sheet"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
@@ -26,6 +27,9 @@ region_rect = Rect2(18, 68, 56, 54)
 [node name="RoutingComponent" type="Node" parent="." unique_id=117874443]
 script = ExtResource("2_routing")
 
+[node name="SteeringComponent" type="Node" parent="." unique_id=827364519]
+script = ExtResource("7_steering")
+
 [node name="HealthComponent" type="Node" parent="." unique_id=1639330408]
 script = ExtResource("3_health")
 
@@ -34,3 +38,4 @@ script = ExtResource("4_shield")
 
 [node name="StealthComponent" type="Node" parent="." unique_id=938484285]
 script = ExtResource("5_stealth")
+

@@ -3,6 +3,7 @@ extends GutTest
 
 const MinionScript = preload("../minion.gd")
 const RoutingComponentScript = preload("../Components/routing_component.gd")
+const SteeringComponentScript = preload("../Components/steering_component.gd")
 const HealthComponentScript = preload("../../Shared/Components/health_component.gd")
 const ShieldComponentScript = preload("../Components/shield_component.gd")
 const StealthComponentScript = preload("../Components/stealth_component.gd")
@@ -13,6 +14,10 @@ func _create_composed_minion() -> CharacterBody2D:
 	var routing = RoutingComponentScript.new()
 	routing.name = "RoutingComponent"
 	minion.add_child(routing)
+	
+	var steering = SteeringComponentScript.new()
+	steering.name = "SteeringComponent"
+	minion.add_child(steering)
 	
 	var health = HealthComponentScript.new()
 	health.name = "HealthComponent"
