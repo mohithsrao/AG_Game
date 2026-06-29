@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://b6782a8ba8ff"]
+
+[ext_resource type="Script" path="res://Entities/Netrun/netrun_test_scene.gd" id="1_scene"]
+[ext_resource type="Script" path="res://Entities/Netrun/Minions/minion_manager.gd" id="2_manager"]
+[ext_resource type="PackedScene" uid="uid://b8ac7c82a201" path="res://Entities/Netrun/Boss/boss_core.tscn" id="3_boss"]
+[ext_resource type="PackedScene" uid="uid://dmre43c829da" path="res://Entities/Netrun/Spawners/port_spawner.tscn" id="4_spawner"]
+[ext_resource type="PackedScene" uid="uid://c6b68a8bc8aa" path="res://Entities/Netrun/Minions/minion.tscn" id="5_minion"]
+[ext_resource type="Resource" uid="uid://dmre28371900" path="res://Entities/Netrun/Shared/Resources/http_minion_data.tres" id="6_http"]
+[ext_resource type="Resource" uid="uid://dmre28371901" path="res://Entities/Netrun/Shared/Resources/https_minion_data.tres" id="7_https"]
+[ext_resource type="Resource" uid="uid://dmre28371902" path="res://Entities/Netrun/Shared/Resources/ssh_minion_data.tres" id="8_ssh"]
+
+[node name="NetrunTestScene" type="Node2D"]
+script = ExtResource("1_scene")
+
+[node name="MinionManager" type="Node" parent="."]
+script = ExtResource("2_manager")
+
+[node name="BossCore" parent="." instance=ExtResource("3_boss")]
+position = Vector2(800, 300)
+
+[node name="Port80Spawner" parent="." instance=ExtResource("4_spawner")]
+position = Vector2(150, 150)
+port_type = 0
+minion_scene = ExtResource("5_minion")
+http_minion_data = ExtResource("6_http")
+https_minion_data = ExtResource("7_https")
+ssh_minion_data = ExtResource("8_ssh")
+
+[node name="Port443Spawner" parent="." instance=ExtResource("4_spawner")]
+position = Vector2(150, 300)
+port_type = 1
+minion_scene = ExtResource("5_minion")
+http_minion_data = ExtResource("6_http")
+https_minion_data = ExtResource("7_https")
+ssh_minion_data = ExtResource("8_ssh")
+
+[node name="Port22Spawner" parent="." instance=ExtResource("4_spawner")]
+position = Vector2(150, 450)
+port_type = 2
+minion_scene = ExtResource("5_minion")
+http_minion_data = ExtResource("6_http")
+https_minion_data = ExtResource("7_https")
+ssh_minion_data = ExtResource("8_ssh")

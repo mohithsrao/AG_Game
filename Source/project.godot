@@ -11,12 +11,15 @@ config_version=5
 [application]
 
 config/name="AG_Game"
+run/main_scene="uid://b6782a8ba8ff"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
+NetrunTypes="*res://Entities/Netrun/Autoloads/netrun_types.gd"
+NetrunEvents="*res://Entities/Netrun/Autoloads/netrun_events.gd"
 
 [display]
 

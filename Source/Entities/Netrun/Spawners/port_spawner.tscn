@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://dmre43c83ada"]
+
+[ext_resource type="Script" uid="uid://bkw35onjpjcve" path="res://Entities/Netrun/Spawners/port_spawner.gd" id="1_spawner"]
+[ext_resource type="Texture2D" uid="uid://cxhk8aa1rb542" path="res://Assets/Sprites/spawner_sheet.png" id="2_sheet"]
+
+[node name="PortSpawner" type="Node2D" unique_id=163754605]
+script = ExtResource("1_spawner")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1704684741]
+texture = ExtResource("2_sheet")
+region_enabled = true
+region_rect = Rect2(115, 55, 57, 56)
